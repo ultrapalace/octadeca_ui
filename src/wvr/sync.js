@@ -7,8 +7,8 @@ export const sync = async() => {
     store.loadingTitle = "Syncing to WVR"
     store.setLoading(true)
     await uploadWavs()
-    await uploadVoiceConfig()
     await uploadPinConfig()
+    await uploadVoiceConfig()
     await uploadMetadata()
     store.setLoading(false)
     let reset = confirm("sync complete, refresh page?")
@@ -37,14 +37,19 @@ const uploadMetadata = async() => {
     store.loadingTitle = "syncing metadata to WVR"
     store.loadProgress = 0
     const meta = store.getMetadata()
-    // console.log(pinConfig)
     const json = JSON.stringify(meta)
     await axios.post(
         "/updateMetadata",
         // "http://192.168.4.1/updatePinConfig",
         json,
         {
-            onUploadProgress: p=>store.onProgress(p.loaded / p.total ),
+            onUploadProgress: p=>{
+                store.onProgress(p.loaded / p.total )
+                if(p.loaded == p.total){
+                    store.loadingTitle = "data sent, waiting for WVR to save"
+                    store.loadProgress = 0
+                }
+            },
             headers:{'Content-Type': 'text/plain'}
         }
     )
@@ -67,6 +72,7 @@ const uploadVoiceConfig = async() => {
         }
     )
     .catch(e=>console.log(e))
+    console.log("uploadVoiceConfig done")
 
 }
 
@@ -122,6 +128,7 @@ const uploadWavs = async () => {
         // var pcm2 = await toPcm(fileHandle)
         // .catch(e=>console.log(e))
         var pcm = await toPcmFX({fileHandle,pitch,dist,verb,pan,vol})
+        // var pcm = await toPcm(fileHandle)
         .catch(e=>console.log(e))
         // console.log(pcm.size, pcm2.size)
         store.loadingTitle = `syncing to WVR ${i+1} of ${uploads.length}`

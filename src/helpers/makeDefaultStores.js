@@ -176,4 +176,5 @@ export const defaultMetadata = {
     recoveryModeStrappingPin : 1,
     wLogVerbosity : 3,
     wifiStartsOn : 1,
+    doStationMode: 0
 }

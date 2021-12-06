@@ -101,6 +101,7 @@ export const toPcmFX = async({fileHandle:f,pitch,dist,verb,pan,vol}) => new Prom
     input_reader.onload = async(e) => {
         var ctx = new AudioContext({sampleRate:44100});
         var buf1 = await ctx.decodeAudioData(e.target.result);
+        console.log(buf1)
         // if there is reverb, add space for the tail
         var reverb_tail_length = verb > 0 ? (44100 * reverb_length) : 0
         var off_ctx = new OfflineAudioContext(
@@ -137,13 +138,25 @@ export const toPcmFX = async({fileHandle:f,pitch,dist,verb,pan,vol}) => new Prom
         off_source.connect(distortion)
         reverb.connect(reverb_gain)
         reverb_gain.connect(masterVolume)
-        distortion.connect(masterVolume)
+        // distortion effects attack so dont use it unless its actually turned up
+        if(dist > 0){
+            distortion.connect(masterVolume)
+        } else {
+            off_source.connect(masterVolume)
+        }
         masterVolume.connect(panning)
         panning.connect(off_ctx.destination)
 
         off_source.start(0)
         off_ctx.oncomplete = e => {
             var buf2 = e.renderedBuffer
+            // var data = buf2.getChannelData(0)
+            // for(let x =0;x<50;x++){
+            //     console.log(data[x])
+            // }
+            // for(let x =50;x>0;x--){
+            //     console.log(data[buf2.length - x])
+            // }
             var audio_blob = bufferToPcmStereo(buf2, 0, buf2.length)
             var file = new File([audio_blob],'noName')
             res(file)
@@ -158,6 +171,10 @@ export const toPcm = f => new Promise((res,rej)=>{
     input_reader.onload = async(e) => {
         var ctx = new AudioContext({sampleRate:44100});
         var audio_buffer = await ctx.decodeAudioData(e.target.result);
+        var data = audio_buffer.getChannelData(0)
+        for(let x =0;x<100;x++){
+            console.log(data[x])
+        }
         console.log("audio_buffer is " + audio_buffer.length + " samples")
         console.log("and " + audio_buffer.numberOfChannels + " channels")
         var audio_blob;
@@ -179,17 +196,21 @@ var bufferToPcmStereo = (abuffer, offset, len) => {
         length = len * numOfChan * 2,
         buffer = new ArrayBuffer(length),
         view = new DataView(buffer),
-        channels = [], i, sample,
+        channels = [], 
+        i, 
+        sample,
+        // pos = 44;
         pos = 0;
     for(i = 0; i < abuffer.numberOfChannels; i++)
         channels.push(abuffer.getChannelData(i));
 
     while(pos < length) {
         for(i = 0; i < numOfChan; i++) {             // interleave channels
-        sample = Math.max(-1, Math.min(1, channels[i][offset])); // clamp
-        sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0; // scale to 16-bit signed int
-        view.setInt16(pos, sample, true);          // update data chunk
-        pos += 2;
+            sample = Math.max(-1, Math.min(1, channels[i][offset])); // clamp
+            // console.log(sample)
+            sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0; // scale to 16-bit signed int
+            view.setInt16(pos, sample, true);          // update data chunk
+            pos += 2;
         }
         offset++                                     // next source sample
     }

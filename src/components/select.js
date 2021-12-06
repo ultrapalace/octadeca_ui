@@ -1,9 +1,11 @@
 import React from 'react';
 import {store} from '../modules/store.js'
+import {Text} from '../components/text'
 
 export const SelectNum = props => 
-<div style={container}>
-    <label>{props.label}</label>
+<div style={{...container, ...props.style}}>
+    <Text primary>{props.label}</Text>
+    {/* <label>{props.label}</label> */}
     <select {...props}
         onChange={e=>props.onChange(parseInt(e.target.value))}
         style={select_style}

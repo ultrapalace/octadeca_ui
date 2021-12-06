@@ -50,7 +50,9 @@ export const initStore = async () => {
 }
 
 const initWebSockets = async() => {
-    ws = new WebSocket(`ws://${WVR_IP}/ws`);
+    // console.log(window.location.hostname)
+    ws = new WebSocket(`ws://${window.location.hostname}/ws`);
+    // ws = new WebSocket(`ws://${WVR_IP}/ws`);
     // ws = new WebSocket("ws://192.168.4.1/ws");
     ws.onopen = e => console.log("ws connected : ", e)
     // ws.onerror = e => ws = initWebSockets()
