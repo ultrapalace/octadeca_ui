@@ -7,11 +7,13 @@ import {initWebMidi} from '../modules/webMidi'
 
 export var ws;
 
-export const init = async () => {
+export const init = async (INIT) => {
     store.handleResize() 
     window.addEventListener('resize', ()=>store.handleResize());
-    await initStore();
-    if (store.isRecoveryMode) return;
+    if(INIT)
+        await initStore();
+    if (store.isRecoveryMode) 
+        return;
     await initWebSockets();
     initWebMidi()
 }
