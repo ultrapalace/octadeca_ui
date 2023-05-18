@@ -9,11 +9,11 @@ import {Pins} from './views/pins'
 import {Firmwares} from './views/firmwares'
 import {Global} from './views/global'
 
-const INIT = 1
+const INIT = 0
 
 const App = () => {
     useEffect(()=>{
-        INIT && init()
+        init(INIT)
     },[])
     return(
         <div style={container}>
@@ -26,7 +26,7 @@ const App = () => {
 
 const views = {
     home : <Home/>,
-    pins : <Pins/>,
+    // pins : <Pins/>,
     firmware : <Firmwares/>,
     global : <Global/>
 }

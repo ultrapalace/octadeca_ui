@@ -9,11 +9,11 @@ export const Menu = observer(() =>
         <MenuButton onClick={()=>store.view="home"}>
             SOUNDS
         </MenuButton>
-        <MenuButton onClick={()=>store.view="pins"}>
-            PINS
+        <MenuButton onClick={()=>store.view="global"}>
+            GLOBAL
         </MenuButton>
-        <Text large secondary onClick={()=>store.view="global"} style={{cursor:'pointer'}}>
-            WVR
+        <Text large secondary >
+            SAMPLE BANKER
         </Text>
         <MenuButton onClick={()=>store.view="firmware"}>
             FIRMWARE

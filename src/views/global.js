@@ -19,7 +19,7 @@ export const Global = observer(() => {
             <Text>
                 GLOBAL SETTINGS
             </Text>
-            <SelectNum
+            {/* <SelectNum
                 style={{marginTop:20}}
                 label="global volume"
                 value={metadata.globalVolume}
@@ -61,7 +61,7 @@ export const Global = observer(() => {
             >
                 <option value={1}>true</option>
                 <option value={0}>false</option>
-            </SelectNum>
+            </SelectNum> */}
             <SelectNum
                 label="wifi power"
                 value={metadata.wifiPower}
@@ -171,7 +171,7 @@ export const Global = observer(() => {
                     warn
                 />
             </div>
-            <Text 
+            {/* <Text 
                 style={{marginLeft:20,marginTop:20, marginRight:'auto'}}
                 primary
             >
@@ -196,9 +196,9 @@ export const Global = observer(() => {
                     title={firmware ? firmware.name : "select firmware"}
                     onClick={()=>{firmwareFileInput.current.click()}}
                 />
-            </div>
+            </div> */}
             <Text 
-                style={{marginLeft:20, marginRight:'auto'}}
+                style={{marginLeft:20, marginRight:'auto', marginTop:20}}
                 primary
             >
                 MIDI data sources :
