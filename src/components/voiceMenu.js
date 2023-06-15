@@ -2,17 +2,34 @@ import React, { useState, useRef, useEffect } from 'react';
 import {Text} from '../components/text'
 import {store} from '../modules/store.js'
 import {observer} from 'mobx-react-lite'
+import { voiceNames } from '../helpers/makeDefaultStores';
+import {Button} from '../components/button'
 
-export const VoiceMenu = () =>
-    <div style={container}>
-        {
-            Array(16).fill().map((_,i)=>
-                <VoiceButton key={i} i={i}/>
-            )
-        }
+export const VoiceMenu = observer(() =>
+    <div>
+        <div style={title}>
+            <Button
+                style={{marginLeft: 76}}
+                title={store.metadata[voiceNames[store.currentVoice]]}
+                onClick={()=>{
+                    const name = window.prompt("enter new voice name")
+                    if(name){
+                        store.metadata[voiceNames[store.currentVoice]] = name
+                        store.configNeedsUpdate = true
+                    }
+                }}
+            />
+
+        </div>
+        <div style={container}>
+            {
+                Array(16).fill().map((_,i)=>
+                    <VoiceButton key={i} i={i}/>
+                )
+            }
+        </div>
     </div>
-
-
+)
 const VoiceButton = observer(({i}) => {
     const downloadJSONRef = useRef()
     const uploadJSONRef = useRef()
@@ -85,4 +102,15 @@ const container = {
     width:'100%',
     display:'flex',
     flexDirection:'row',
+}
+
+const title = {
+    width:"100%", 
+    color:"gold",  
+    flexDirection:"row", 
+    display:"flex",
+    alignItems:"center",
+    marginTop:10,
+    marginBottom:10,
+    fontSize:22
 }

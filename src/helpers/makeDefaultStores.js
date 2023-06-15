@@ -220,6 +220,25 @@ export const defaultPinConfig = [
     },
 ]
 
+export const voiceNames = [
+    "voiceName1",
+    "voiceName2",
+    "voiceName3",
+    "voiceName4",
+    "voiceName5",
+    "voiceName6",
+    "voiceName7",
+    "voiceName8",
+    "voiceName9",
+    "voiceName10",
+    "voiceName11",
+    "voiceName12",
+    "voiceName13",
+    "voiceName14",
+    "voiceName15",
+    "voiceName16",
+]
+
 export const defaultMetadata = {
     globalVolume : 127,
     shouldCheckStrappingPin : 1,
@@ -227,4 +246,20 @@ export const defaultMetadata = {
     wLogVerbosity : 3,
     wifiStartsOn : 1,
     midiChannel : 0,
+    voiceName1: "empty1",
+    voiceName2: "empty2",
+    voiceName3: "empty3",
+    voiceName4: "empty4",
+    voiceName5: "empty5",
+    voiceName6: "empty6",
+    voiceName7: "empty7",
+    voiceName8: "empty8",
+    voiceName9: "empty9",
+    voiceName10: "empty10",
+    voiceName11: "empty11",
+    voiceName12: "empty12",
+    voiceName13: "empty13",
+    voiceName14: "empty14",
+    voiceName15: "empty15",
+    voiceName16: "empty16",
 }
