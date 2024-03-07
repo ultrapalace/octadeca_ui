@@ -13,7 +13,7 @@ export const Menu = observer(() =>
             GLOBAL
         </MenuButton>
         <Text large secondary >
-            SAMPLE BANKER
+            OCTADECA
         </Text>
         <MenuButton onClick={()=>store.view="firmware"}>
             FIRMWARE
