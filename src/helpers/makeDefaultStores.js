@@ -1,6 +1,30 @@
 import {observable} from 'mobx'
-import {IGNORE, NOTE_ON, ONE_SHOT, RETRIGGER, EDGE_FALLING, EDGE_NONE, ROOT_SQUARE} from '../modules/constants'
+import {IGNORE, NOTE_ON, ONE_SHOT, RETRIGGER, EDGE_FALLING, EDGE_NONE, ROOT_SQUARE, SQUARE_ROOT} from '../modules/constants'
 import { store } from '../modules/store'
+
+export const defaultBanks = () => {
+    const banks = [{
+        name: "default",
+        midiChannel: 0,
+        transpose: 0,
+        pitchbendRangeUp: 2,
+        pitchbendRangeDown: 2,
+        responseCurve: SQUARE_ROOT,
+        polyphonic: 1
+    }]
+    for(let i=1; i<32; i++){
+        banks.push({
+            name: "",
+            midiChannel: 0,
+            transpose: 0,
+            pitchbendRangeUp: 2,
+            pitchbendRangeDown: 2,
+            responseCurve: SQUARE_ROOT,
+            polyphonic: 1
+        })
+    }
+    return observable(banks)
+}
 
 export const defaultVoices = () => {
     const voices = []
@@ -24,7 +48,8 @@ export const defaultVoices = () => {
                 verb:0,
                 pitch:0,
                 vol:100,
-                pan:0
+                pan:0,
+                reverse:false
             })
         }
         voices[i]=observable(voice)
@@ -237,6 +262,22 @@ export const voiceNames = [
     "voiceName14",
     "voiceName15",
     "voiceName16",
+    "voiceName17",
+    "voiceName18",
+    "voiceName19",
+    "voiceName20",
+    "voiceName21",
+    "voiceName22",
+    "voiceName23",
+    "voiceName24",
+    "voiceName25",
+    "voiceName26",
+    "voiceName27",
+    "voiceName28",
+    "voiceName29",
+    "voiceName30",
+    "voiceName31",
+    "voiceName32",
 ]
 
 export const defaultMetadata = {
@@ -246,20 +287,39 @@ export const defaultMetadata = {
     wLogVerbosity : 3,
     wifiStartsOn : 1,
     midiChannel : 0,
-    voiceName1: "empty1",
-    voiceName2: "empty2",
-    voiceName3: "empty3",
-    voiceName4: "empty4",
-    voiceName5: "empty5",
-    voiceName6: "empty6",
-    voiceName7: "empty7",
-    voiceName8: "empty8",
-    voiceName9: "empty9",
-    voiceName10: "empty10",
-    voiceName11: "empty11",
-    voiceName12: "empty12",
-    voiceName13: "empty13",
-    voiceName14: "empty14",
-    voiceName15: "empty15",
-    voiceName16: "empty16",
+    pitchBendSemitonesUp : 2,
+    pitchBendSemitonesDown : 2,
+    doStationMode: 0,
+    voiceName1: "fgh",
+    voiceName2: "fgh",
+    voiceName3: "fgh",
+    voiceName4: "fgh",
+    voiceName5: "fgh",
+    voiceName6: "fgh",
+    voiceName7: "fgh",
+    voiceName8: "fgh",
+    voiceName9: "fgh",
+    voiceName10: "",
+    voiceName11: "",
+    voiceName12: "",
+    voiceName13: "",
+    voiceName14: "",
+    voiceName15: "",
+    voiceName16: "",
+    voiceName17: "",
+    voiceName18: "",
+    voiceName19: "",
+    voiceName20: "",
+    voiceName21: "",
+    voiceName22: "",
+    voiceName23: "",
+    voiceName24: "",
+    voiceName25: "",
+    voiceName26: "",
+    voiceName27: "",
+    voiceName28: "",
+    voiceName29: "",
+    voiceName30: "",
+    voiceName31: "",
+    voiceName32: "",
 }

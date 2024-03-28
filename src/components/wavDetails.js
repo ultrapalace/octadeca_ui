@@ -8,17 +8,18 @@ import {Stack} from './stack'
 import {Button} from './button'
 import {Slider} from './slider'
 import {auditionLocal, auditionDisk} from '../audio/audition'
-import {NOTE_OFF,ONE_SHOT,LOOP,PING_PONG,ASR_LOOP,RETRIGGER,RESTART,NONE,HALT,IGNORE,
-    PRIORITIES,LINEAR,FIXED,SQUARE_ROOT,INV_SQUARE_ROOT} from '../modules/constants'
+import {NOTE_OFF,ONE_SHOT,LOOP,PAUSE,ASR_LOOP,RETRIGGER,RESTART,NONE,HALT,IGNORE,RELEASE,
+    PRIORITIES,LINEAR,FIXED,SQUARE_ROOT,INV_SQUARE_ROOT,PAUSE_LOOP,PAUSE_ASR} from '../modules/constants'
 import {SelectNum} from '../components/select'
 import {NumberInput} from '../components/numberInput'
+import { Checkbox } from './checkbox.js';
 
 export const WavDetails = observer(() => {
     const filePicker = useRef(null)
     const directoryPicker = useRef(null)
     const canvas = useRef(null)
     const [showSettings, setShowSettings] = useState(true)
-    const {name,size,filehandle,mode,retrigger,noteOff,responseCurve,priority,muteGroup,dist,verb,pitch,vol,pan,loopStart,loopEnd,empty,samples} = store.getCurrentNote()
+    const {name,size,filehandle,mode,retrigger,noteOff,responseCurve,priority,muteGroup,dist,verb,pitch,vol,pan,reverse,loopStart,loopEnd,empty,samples} = store.getCurrentNote()
     const range = store.wavBoardRange.length > 0
     const allowMultiple = store.wavBoardRange.length > 1 && store.wavBoardInterpolationTarget == undefined
     const maxSampleIndex = filehandle ? samples : size / 4 // if this is a fresh file, we use the wav analyzer, if its been synced already, we use the raw file size, as the headers have been stripped already
@@ -39,9 +40,10 @@ export const WavDetails = observer(() => {
                 filehandle,
                 loopStart,
                 loopEnd,
-                showLoop: mode == ASR_LOOP,
+                showLoop: mode == ASR_LOOP || mode == PAUSE_ASR,
                 width: canvas.current.width,
-                height: canvas.current.height
+                height: canvas.current.height,
+                pitch
             }) : 
             ctx.clearRect(0, 0, canvas.current.width, canvas.current.height)
     })
@@ -108,8 +110,10 @@ export const WavDetails = observer(() => {
                             >
                                 <option value={ONE_SHOT}>one-shot</option>
                                 <option value={LOOP}>loop</option>
-                                {/* <option value={PING_PONG}>ping-pong</option> */}
                                 <option value={ASR_LOOP}>ASR loop</option>
+                                <option value={PAUSE}>pause/resume</option>
+                                <option value={PAUSE_LOOP}>pause/loop</option>
+                                <option value={PAUSE_ASR}>pause/asr</option>
                             </SelectNum>
                             <SelectNum
                                 value={retrigger}
@@ -128,8 +132,12 @@ export const WavDetails = observer(() => {
                                 onChange={e=>store.setCurrentNoteProp('noteOff',e)}
                                 style={{width:270}}
                             >
-                                <option value={IGNORE}>{ mode==ASR_LOOP ? "release" : "ignore"}</option>
+                                {/* <option value={IGNORE}>{ mode==ASR_LOOP ? "release" : "ignore"}</option> */}
+                                <option value={IGNORE}>ignore</option>
                                 <option value={HALT}>halt</option>
+                                {(mode==ASR_LOOP) && 
+                                    <option value={RELEASE}>release</option>
+                                }
                             </SelectNum>
                             <SelectNum
                                 value={responseCurve}
@@ -170,7 +178,7 @@ export const WavDetails = observer(() => {
                                     )
                                 }
                             </SelectNum>
-                            {(mode == ASR_LOOP) && (empty == false) && 
+                            {(mode == ASR_LOOP || mode == PAUSE_ASR) && (empty == false) && 
                             // only show ASR-looping settings for files on WVR
                                 <div>
                                     <NumberInput
@@ -191,6 +199,7 @@ export const WavDetails = observer(() => {
                                         onChange = {val=>store.setCurrentNoteProp("loopEnd",clamp(val, 1, maxSampleIndex - 1))}
                                         onSubmit = {()=>{
                                             // ASR LOOP breaks if there is no A or no R, so we must ensure there is at least 1 sample for each section
+                                            console.log({maxSampleIndex, filehandle, samples, size})
                                             let val = clamp(loopEnd, Math.min(loopStart + 1, maxSampleIndex - 1), maxSampleIndex - 1)
                                             store.setCurrentNoteProp("loopEnd",val)
                                         }}
@@ -231,6 +240,11 @@ export const WavDetails = observer(() => {
                                 onChange={e=>store.setCurrentNoteProp("pan",e)}
                                 value={pan}
                                 label="pan"
+                            />
+                            <Checkbox
+                                label = "reverse"
+                                value = {reverse}
+                                onChange = {e=>store.setCurrentNoteProp("reverse",e)}
                             />
                         </div>
                 }

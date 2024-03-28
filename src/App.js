@@ -3,13 +3,13 @@ import {observer} from 'mobx-react-lite'
 import {store} from './modules/store.js'
 import {init} from './wvr/init'
 import {Menu} from './components/menu'
+import {Banks} from './views/banks'
 import {Loading} from './components/loading'
 import {Home} from './views/home'
-import {Pins} from './views/pins'
 import {Firmwares} from './views/firmwares'
 import {Global} from './views/global'
 
-const INIT = 1
+const INIT = 0
 
 const App = () => {
     useEffect(()=>{
@@ -25,6 +25,7 @@ const App = () => {
 }
 
 const views = {
+    banks: <Banks/>,
     home : <Home/>,
     // pins : <Pins/>,
     firmware : <Firmwares/>,

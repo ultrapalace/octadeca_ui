@@ -7,25 +7,25 @@ import {SelectNum} from '../components/select'
 import {store} from '../modules/store'
 import { restoreEMMC, resetEMMC } from '../wvr/emmc';
 import {initWebMidi} from '../modules/webMidi'
+import {fetchLocalIP} from '../wvr/localNetwork'
+import {joinLocalNetwork} from '../wvr/localNetwork'
 import { handleSFZ } from '../helpers/sfz';
+import { toJS } from 'mobx';
+
 export const Global = observer(() => {
-
     const [firmware,setFirmware] = useState(null)
-
     const firmwareFileInput = useRef(null)
     const emmcRestoreFileInput = useRef(null)
     const emmcBackupRef = useRef(null)
     const sfzFileInput = useRef(null)
     const sfzFolderInput = useRef(null)
-
     const metadata = store.getMetadata()
-
     return(
         <div style={container}>
             <Text>
                 GLOBAL SETTINGS
             </Text>
-            {/* <SelectNum
+            <SelectNum
                 style={{marginTop:20}}
                 label="global volume"
                 value={metadata.globalVolume}
@@ -67,7 +67,7 @@ export const Global = observer(() => {
             >
                 <option value={1}>true</option>
                 <option value={0}>false</option>
-            </SelectNum> */}
+            </SelectNum>
             <SelectNum
                 label="wifi power"
                 value={metadata.wifiPower}
@@ -93,9 +93,23 @@ export const Global = observer(() => {
                 <option value={0}>OMNI</option>
                 {Array(16).fill().map((x,i)=><option value={i+1} key={i}>{i+1}</option>)}
             </SelectNum>
+            <SelectNum
+                label="pitch bend up"
+                value={metadata.pitchBendSemitonesUp}
+                onChange={e=>store.setMetadataField('pitchBendSemitonesUp',e)}  
+            >
+                {[0, 1, 2].map(x=><option value={x} key={x}>{x}</option>)}
+            </SelectNum>
+            <SelectNum
+                label="pitch bend down"
+                value={metadata.pitchBendSemitonesDown}
+                onChange={e=>store.setMetadataField('pitchBendSemitonesDown',e)}  
+            >
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(x=><option value={x} key={x}>{x}</option>)}
+            </SelectNum>
 
             <div style={{display:'flex',flexDirection:'row',alignItems:'center', marginLeft:20, width:400}}>
-                <Text primary>wifi network name :</Text>
+                <Text primary>WVR wifi network name :</Text>
                 <Text warn style={{marginLeft:10}}>{store.metadata.wifiNetworkName}</Text>
                 <Button
                     style={{marginLeft:'auto'}}
@@ -110,7 +124,7 @@ export const Global = observer(() => {
                 />
             </div>
             <div style={{display:'flex',flexDirection:'row',alignItems:'center', marginLeft:20, width:400}}>
-                <Text primary>wifi network password :</Text>
+                <Text primary>WVR wifi network password :</Text>
                 <Text warn style={{marginLeft:10}}>{store.metadata.wifiNetworkPassword}</Text>
                 <Button
                     style={{marginLeft:'auto'}}
@@ -177,7 +191,7 @@ export const Global = observer(() => {
                     warn
                 />
             </div>
-            {/* <Text 
+            <Text 
                 style={{marginLeft:20,marginTop:20, marginRight:'auto'}}
                 primary
             >
@@ -202,15 +216,14 @@ export const Global = observer(() => {
                     title={firmware ? firmware.name : "select firmware"}
                     onClick={()=>{firmwareFileInput.current.click()}}
                 />
-            </div> */}
+            </div>
             <Text 
-                style={{marginLeft:20, marginRight:'auto', marginTop:20}}
+                style={{marginLeft:20, marginRight:'auto'}}
                 primary
             >
                 MIDI data sources :
             </Text>
-            <div style={{display:'flex',flexDirection:'row',margin:20, marginTop:5}}>
-
+            <div style={{display:'flex',flexDirection:'row',margin:20, marginTop:5, marginBottom:5}}>
                 <Button
                     title="refresh"
                     onClick={()=>initWebMidi()}
@@ -242,6 +255,71 @@ export const Global = observer(() => {
                     onClick={()=>sfzFolderInput.current.click()}
                 />
             </div>
+            <div style={{marginBottom:20}}>
+                <SelectNum
+                    style={{width:350, marginTop:20}}
+                    label="join external wifi network"
+                    value={metadata.doStationMode}
+                    onChange={e=>store.setMetadataField('doStationMode',e)}
+                >
+                    <option value={1}>yes</option>
+                    <option value={0}>no</option>
+                </SelectNum>
+                {store.metadata.doStationMode &&
+                    <div style={{display:'flex',flexDirection:'row',alignItems:'center', marginLeft:20, width:400}}>
+                        <Text primary>join network name :</Text>
+                        <Text warn style={{marginLeft:10}}>{store.metadata.stationWifiNetworkName}</Text>
+                        <Button
+                            style={{marginLeft:'auto'}}
+                            title="change"
+                            onClick={()=>{
+                                const name = window.prompt("enter the WIFI network name")
+                                if(name){
+                                    store.metadata.stationWifiNetworkName = name
+                                }
+                            }}
+                        />
+                    </div>
+                }
+                {store.metadata.doStationMode &&
+                    <div style={{display:'flex',flexDirection:'row',alignItems:'center', marginLeft:20, width:400}}>
+                        <Text primary>join network password :</Text>
+                        <Text warn style={{marginLeft:10}}>{store.metadata.stationWifiNetworkPassword}</Text>
+                        <Button
+                            style={{marginLeft:'auto'}}
+                            title="change"
+                            onClick={()=>{
+                                const name = window.prompt("enter the WIFI password")
+                                if(name){
+                                    store.metadata.stationWifiNetworkPassword = name
+                                }
+                            }}
+                        />
+                    </div>
+                }
+                {store.metadata.doStationMode &&
+                    <div style={{display:'flex',flexDirection:'row',alignItems:'center', marginLeft:20, width:400}}>
+                        <Text primary>
+                            {"local IP Address : "}
+                        </Text>
+                        <Text warn style={{userSelect:"default", marginLeft:10}}>
+                            {store.localIP || "unknown"}
+                        </Text>
+                        <Button
+                            style={{marginLeft:'auto'}}
+                            title="get IP Address"
+                            onClick={()=>fetchLocalIP()}
+                        />
+                    </div>
+                }
+                {store.metadata.doStationMode &&
+                    <Button
+                        style={{marginLeft:20, width:350}}
+                        title="try new network and password"
+                        onClick={()=>joinLocalNetwork()}
+                    />
+                } 
+            </div>           
             <input 
                 ref={firmwareFileInput}
                 type="file" 
@@ -272,7 +350,7 @@ export const Global = observer(() => {
                 style={{display:'none'}}
                 directory="" 
                 webkitdirectory=""
-                />
+            />
             <input 
                 ref={sfzFileInput}
                 multiple
@@ -292,6 +370,7 @@ export const Global = observer(() => {
                 href='/wvr_emmc_backup.bin' 
                 download
                 ref={emmcBackupRef}
+                style={{display:'none'}}
             />
         </div>
     )

@@ -1,5 +1,5 @@
 
-export const WVR_IP = "192.168.5.18"
+export const WVR_IP = "192.168.4.1"
 
 // view constants
 export const WAV_ITEM_SIZE = 100
@@ -11,8 +11,10 @@ export const WAV_ITEM_SIZE = 100
 // play_back_mode
 export const ONE_SHOT     = 0
 export const LOOP         = 1
-export const PING_PONG    = 2
+export const PAUSE        = 2
 export const ASR_LOOP     = 3
+export const PAUSE_LOOP   = 4
+export const PAUSE_ASR    = 5
 
 // retrigger_mode
 export const RETRIGGER    = 0
@@ -38,8 +40,8 @@ export const FIXED           = 3
 export const NOTE_ON      = 0
 export const BANK_UP      = 1
 export const BANK_DOWN    = 2
-export const WRV_WIFI_ON  = 3
-export const WRV_WIFI_OFF = 4
+export const WVR_WIFI_ON  = 3
+export const WVR_WIFI_OFF = 4
 export const TOGGLE_WIFI  = 5
 export const VOLUME_UP    = 6
 export const VOLUME_DOWN  = 7

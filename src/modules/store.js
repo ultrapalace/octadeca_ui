@@ -3,7 +3,7 @@ import {themes} from './themes.js'
 import {MAX_LAYERS_PER_RACK, WAV_ITEM_SIZE, NUM_RACK_SLOTS} from './constants'
 import {clamp} from '../helpers/clamp.js'
 import {makeName, makeRackName} from '../helpers/makeName'
-import {defaultVoices, defaultPinConfig, defaultMetadata, default_fx} from '../helpers/makeDefaultStores'
+import {defaultVoices, defaultBanks, defaultPinConfig, defaultMetadata, default_fx} from '../helpers/makeDefaultStores'
 import { parseDirectories } from '../helpers/parseDirectories.js'
 import {numberSort} from '../helpers/numberSort'
 import { analyzeWav } from '../audio/analyzeWav.js'
@@ -16,7 +16,7 @@ configure({
 
 export const store = observable(
     {
-        view: 'home',
+        view: 'banks',
         theme: themes.dark,
 
         loading: false,
@@ -30,6 +30,7 @@ export const store = observable(
 
         numWavPerPage: 6,
         currentVoice: 0,
+        currentBank: 0,
 
         wavBoardIndex: 40,
         wavBoardSelected: 40,
@@ -44,16 +45,20 @@ export const store = observable(
         currentFirmwareIndex: -1,
         currentWebsiteIndex: -1,
 
+        banks: defaultBanks(),
         voices: defaultVoices(),
         firmwares: observable([]),
         websites: observable([]),
         pinConfig: observable(defaultPinConfig),
         metadata: observable(defaultMetadata),
 
-        midiInputs: [],
+        midiInputs: observable([]),
 
         getVoices:function(){
             return toJS(this.voices)
+        },
+        getBanks:function(){
+            return toJS(this.banks)
         },
         getMetadata:function(){
             return toJS(this.metadata)
@@ -72,6 +77,7 @@ export const store = observable(
         setCurrentRackName:function(x){setCurrentRackName(this,x)},
         getNote:function(voice,note){return getNote(this,voice,note)},
         getCurrentNote:function(){return getCurrentNote(this)},
+        getCurrentBank:function(){return getCurrentBank(this)},
         clearCurrentNote:function(){return clearCurrentNote(this)},
         clearSelectedNotes:function(){return clearSelectedNotes(this)},
         getRackBreakPoint:function(i){return getRackBreakPoint(this,i)},
@@ -83,6 +89,8 @@ export const store = observable(
         getPinConfig:function(){return getPinConfig(this)},
         setCurrentPinProp:function(prop,val){setCurrentPinProp(this,prop,val)},
         setCurrentNoteProp:function(prop,val){setCurrentNoteProp(this,prop,val)},
+        setCurrentBankProp:function(prop,val){setCurrentBankProp(this,prop,val)},
+        setBankName:function(num,val){setBankName(this,num,val)},
         setMetadataField:function(prop,val){setMetadataField(this,prop,val)},
         noteOn:function(voice, note){noteOn(this,voice,note)},
         noteOff:function(voice, note){noteOff(this,voice,note)},
@@ -229,6 +237,7 @@ const setRackName = (self,note,name) =>{
 const getNote = (self,voice,note) => self.voices.slice()[voice][note]
 
 const getCurrentNote = self => self.voices.slice()[self.currentVoice][self.wavBoardSelected]
+const getCurrentBank = self => self.banks.slice()[self.currentBank]
 
 const clearCurrentNote = self => {
     self.voices[self.currentVoice][self.wavBoardSelected] = {
@@ -387,9 +396,13 @@ const setCurrentWavFile = async (self,files) => {
             if(self.wavBoardInterpolationTarget != undefined){
                 // interpolate
                 if(!window.confirm(`interpolate pitch across ${self.wavBoardRange.length} notes?`))return false
+                const len = await analyzeWav(files[0])
                 for(let i=0;i<self.wavBoardRange.length;i++){
                     let pitch = self.wavBoardRange[i] - self.wavBoardInterpolationTarget
                     let stretch = semitonesToStretch(pitch)
+                    const newLen = Math.floor(len * stretch)
+                    self.voices[self.currentVoice][self.wavBoardRange[i]].samples = newLen
+                    self.voices[self.currentVoice][self.wavBoardRange[i]].loopEnd = newLen - 1
                     self.voices[self.currentVoice][self.wavBoardRange[i]].filehandle = files[0]
                     self.voices[self.currentVoice][self.wavBoardRange[i]].name = makeName(files[0].name)
                     self.voices[self.currentVoice][self.wavBoardRange[i]].size = files[0].size
@@ -458,6 +471,16 @@ const setCurrentNoteProp = (self,prop,val) => {
     } else {
         setNoteProp(self,self.wavBoardSelected,prop,val)
     }
+}
+
+const setCurrentBankProp = (self,prop,val) => {
+    self.banks[self.currentBank][prop] = val
+}
+
+const setBankName = (self, num, name) => {
+    const banks = self.getBanks()
+    banks[num].name = name
+    self.banks.replace(banks)
 }
 
 const setNoteProp = (self,note,prop,val) => {
