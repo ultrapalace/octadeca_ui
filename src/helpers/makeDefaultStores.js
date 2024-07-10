@@ -1,10 +1,11 @@
 import {observable} from 'mobx'
-import {IGNORE, NOTE_ON, ONE_SHOT, RETRIGGER, EDGE_FALLING, EDGE_NONE, ROOT_SQUARE, SQUARE_ROOT} from '../modules/constants'
+import {IGNORE, NOTE_ON, ONE_SHOT, RETRIGGER, EDGE_FALLING, EDGE_NONE, ROOT_SQUARE, SQUARE_ROOT, NUM_BANKS} from '../modules/constants'
 import { store } from '../modules/store'
 
 export const defaultBanks = () => {
     const banks = [{
         name: "default",
+        voice: 0,
         midiChannel: 0,
         transpose: 0,
         pitchbendRangeUp: 2,
@@ -12,9 +13,10 @@ export const defaultBanks = () => {
         responseCurve: SQUARE_ROOT,
         polyphonic: 1
     }]
-    for(let i=1; i<32; i++){
+    for(let i=1; i<NUM_BANKS; i++){
         banks.push({
             name: "",
+            voice: i,
             midiChannel: 0,
             transpose: 0,
             pitchbendRangeUp: 2,
@@ -100,7 +102,6 @@ export const fillVoices = () => {
     const voices = [voice,[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
     store.voices.replace(voices)
 }
-
 
 export const defaultPinConfig = [
     {
@@ -290,36 +291,36 @@ export const defaultMetadata = {
     pitchBendSemitonesUp : 2,
     pitchBendSemitonesDown : 2,
     doStationMode: 0,
-    voiceName1: "fgh",
-    voiceName2: "fgh",
-    voiceName3: "fgh",
-    voiceName4: "fgh",
-    voiceName5: "fgh",
-    voiceName6: "fgh",
-    voiceName7: "fgh",
-    voiceName8: "fgh",
-    voiceName9: "fgh",
-    voiceName10: "",
-    voiceName11: "",
-    voiceName12: "",
-    voiceName13: "",
-    voiceName14: "",
-    voiceName15: "",
-    voiceName16: "",
-    voiceName17: "",
-    voiceName18: "",
-    voiceName19: "",
-    voiceName20: "",
-    voiceName21: "",
-    voiceName22: "",
-    voiceName23: "",
-    voiceName24: "",
-    voiceName25: "",
-    voiceName26: "",
-    voiceName27: "",
-    voiceName28: "",
-    voiceName29: "",
-    voiceName30: "",
-    voiceName31: "",
-    voiceName32: "",
+    // voiceName1: "fgh",
+    // voiceName2: "fgh",
+    // voiceName3: "fgh",
+    // voiceName4: "fgh",
+    // voiceName5: "fgh",
+    // voiceName6: "fgh",
+    // voiceName7: "fgh",
+    // voiceName8: "fgh",
+    // voiceName9: "fgh",
+    // voiceName10: "",
+    // voiceName11: "",
+    // voiceName12: "",
+    // voiceName13: "",
+    // voiceName14: "",
+    // voiceName15: "",
+    // voiceName16: "",
+    // voiceName17: "",
+    // voiceName18: "",
+    // voiceName19: "",
+    // voiceName20: "",
+    // voiceName21: "",
+    // voiceName22: "",
+    // voiceName23: "",
+    // voiceName24: "",
+    // voiceName25: "",
+    // voiceName26: "",
+    // voiceName27: "",
+    // voiceName28: "",
+    // voiceName29: "",
+    // voiceName30: "",
+    // voiceName31: "",
+    // voiceName32: "",
 }

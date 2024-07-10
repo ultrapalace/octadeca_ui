@@ -18,7 +18,7 @@ export const Home = observer(() => {
     },[])
     return(
         <div style={container}>
-            <VoiceMenu/>
+            {/* <VoiceMenu/> */}
             <WavBoard/>
             <FileDetails/>
             {store.isRecoveryMode &&

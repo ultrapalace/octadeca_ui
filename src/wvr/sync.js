@@ -3,6 +3,7 @@ import { store } from '../modules/store.js';
 import { toPcmFX } from '../audio/toPcm.js'
 import { loadVoice } from '../wvr/init.js';
 import { default_fx } from '../helpers/makeDefaultStores.js';
+import { NUM_BANKS } from '../modules/constants.js';
 
 export const sync = async() => {
     store.resetSelected()
@@ -11,8 +12,9 @@ export const sync = async() => {
     store.setLoading(true)
     
     await uploadWavs()
-    await uploadPinConfig()
+    // await uploadPinConfig()
     await uploadVoiceConfig()
+    await uploadBankConfig()
     await uploadMetadata()
     store.setLoading(false)
     resetFileHandles()
@@ -105,6 +107,29 @@ const uploadSingleVoiceConfig = async(numVoice) => {
         retry=true
     })
     // retry && await uploadSingleVoiceConfig(numVoice)
+}
+
+const uploadBankConfig = async () => {
+    const banks = store.getBanks()
+    const json = JSON.stringify(banks)
+    console.log({banks})
+    store.loadingTitle = `syncing banks`
+    store.loadProgress = 0
+    await axios.post(
+        "/updateBankConfig",
+        json,
+        {
+            onUploadProgress: p=>{
+                store.onProgress(p.loaded / p.total)
+            },
+            headers:{
+                'Content-Type': 'application/json',
+            }
+        }
+    )
+    .catch(e=>{
+        console.log(e)
+    })
 }
 
 const uploadVoiceConfig = async() => {

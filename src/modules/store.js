@@ -135,6 +135,7 @@ const onConnect = (self,data) => {
     self.firmwares.replace(data.firmwares)
     self.websites.replace(data.websites)
     self.pinConfig.replace(data.pinConfig)
+    self.banks.replace(data.banks)
     self.metadata = data.metadata
     self.currentFirmwareIndex = data.currentFirmwareIndex
     self.currentWebsiteIndex = data.currentWebsiteIndex

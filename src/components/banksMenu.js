@@ -3,9 +3,10 @@ import {Text} from '../components/text'
 import {store} from '../modules/store.js'
 import {observer} from 'mobx-react-lite'
 import {Button} from '../components/button'
+import { NUM_BANKS } from '../modules/constants.js';
 
 const getNextBank = () => {
-    for(var i=0; i<32; i++){
+    for(var i=0; i<NUM_BANKS; i++){
         const name = store.banks[i].name
         if(name.length == 0){
             return i
@@ -18,7 +19,7 @@ export const BanksMenu = observer(() =>
     <div>
         <div style={container}>
             {
-                [...Array(33).fill()].map((_,i)=>
+                [...Array(NUM_BANKS + 1).fill()].map((_,i)=>
                     <BankButton key={i} i={i}/>
                 )
             }
@@ -28,7 +29,7 @@ export const BanksMenu = observer(() =>
 const BankButton = observer(({i}) => {
     const downloadJSONRef = useRef()
     const uploadJSONRef = useRef()
-    if(i == 32){
+    if(i == NUM_BANKS){
         return(
             <div 
                 style={bankButton(-1)}

@@ -8,8 +8,9 @@ import {Loading} from './components/loading'
 import {Home} from './views/home'
 import {Firmwares} from './views/firmwares'
 import {Global} from './views/global'
+import {Pins} from './views/pins'
 
-const INIT = 0
+const INIT = 1
 
 const App = () => {
     useEffect(()=>{
@@ -27,7 +28,7 @@ const App = () => {
 const views = {
     banks: <Banks/>,
     home : <Home/>,
-    // pins : <Pins/>,
+    pins : <Pins/>,
     firmware : <Firmwares/>,
     global : <Global/>
 }

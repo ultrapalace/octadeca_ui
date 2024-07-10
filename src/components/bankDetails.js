@@ -4,6 +4,9 @@ import {observer} from 'mobx-react-lite'
 import {clamp} from '../helpers/clamp'
 import {Button} from './button'
 import {auditionLocal, auditionDisk} from '../audio/audition'
+import { handleSFZ } from '../helpers/sfz.js';
+import {Text} from '../components/text'
+
 
 
 import {NOTE_OFF,ONE_SHOT,LOOP,PAUSE,ASR_LOOP,RETRIGGER,RESTART,NONE,HALT,IGNORE,RELEASE,
@@ -13,8 +16,13 @@ import {SelectNum} from '../components/select'
 import { Checkbox } from './checkbox.js';
 
 export const BankDetails = observer(() => {
+
     const filePicker = useRef(null)
     const directoryPicker = useRef(null)
+
+    const sfzFileInput = useRef(null)
+    const sfzFolderInput = useRef(null)
+
     const {midiChannel, transpose, pitchbendRangeUp, pitchbendRangeDown, responseCurve, polyphonic} = store.getCurrentBank()
     const allowMultiple = store.wavBoardRange.length > 1 && store.wavBoardInterpolationTarget == undefined
     return(
@@ -136,24 +144,17 @@ export const BankDetails = observer(() => {
 
                 <div style={{...column,marginLeft:'auto'}}>
                     <Button
-                        title={allowMultiple ? "select files": "select file"}
-                        // onClick={()=>filePicker.current.click()}
-                        onClick={({shiftKey,altKey,metaKey})=>{
-                            if(shiftKey && altKey){
-                                // TODO interpolate racks
-
-                            } else if(shiftKey){
-                                if(store.wavBoardRange.length < 2){
-                                    window.alert("Please select range of notes to enable bulk rack upload")
-                                    return
-                                }
-                                directoryPicker.current.click()
-                            } else {
-                                filePicker.current.click()
-                            } 
-                        }}
-                    />
+                        style={{width:200}}
+                        title="select .sfz file"
+                        onClick={()=>sfzFileInput.current.click()}
+                        />
                     <Button
+                        style={{width:200}}
+                        title="select .sfz folder"
+                        onClick={()=>sfzFolderInput.current.click()}
+                        />
+                    <Button
+                        style={{width:200}}
                         title="bank details"
                         onClick={()=>{
                             store.currentVoice = store.currentBank
@@ -176,6 +177,38 @@ export const BankDetails = observer(() => {
                     />
                 </div>
             </div>
+            <input 
+                ref={sfzFolderInput}
+                multiple
+                type="file" 
+                onChange={async e=>{
+                    if(!e.target.files.length) return
+                    e.persist()
+                    store.setLoading(true)
+                    await handleSFZ(e).catch(alert)
+                    e.target.value = null
+                    store.setLoading(false)
+                    store.view="home"
+                }}
+                style={{display:'none'}}
+                directory="" 
+                webkitdirectory=""
+            />
+            <input 
+                ref={sfzFileInput}
+                multiple
+                type="file" 
+                onChange={async e=>{
+                    if(!e.target.files.length) return
+                    e.persist()
+                    store.setLoading(true)
+                    await handleSFZ(e).catch(alert)
+                    e.target.value = null
+                    store.setLoading(false)
+                    store.view="home"
+                }}
+                style={{display:'none'}}
+            />
         </div>
 )})
 
