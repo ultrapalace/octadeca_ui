@@ -95,7 +95,7 @@ export const BankDetails = observer(() => {
                         style={{width:400}}
                     >
                         {
-                            [0,1,2,3,4,5,6,7,8,9,10,11,12].map(x=>
+                            [0,1,2].map(x=>
                                 <option value={x} key={x}>
                                     {x + " semitones"}
                                 </option>    
@@ -157,8 +157,18 @@ export const BankDetails = observer(() => {
                         style={{width:200}}
                         title="bank details"
                         onClick={()=>{
-                            store.currentVoice = store.currentBank
+                            store.currentVoice = store.getCurrentBank().voice
                             store.view = "home"
+                        }}
+                    />
+                    <Button
+                        style={{width:200}}
+                        title="rename bank"
+                        onClick={()=>{
+                            const name = window.prompt("enter new bank name")
+                            if(!name) return
+                            store.configNeedsUpdate = true
+                            store.setBankName(store.currentBank, name)
                         }}
                     />
                     <Button
@@ -166,12 +176,11 @@ export const BankDetails = observer(() => {
                         // style={{border:"1px solid red"}}
                         title="delete"
                         onClick={()=>{
-                            if(allowMultiple ? window.confirm(`clear ${store.wavBoardRange.length} selected notes?`) : window.confirm("clear this note?")){
-                                if(allowMultiple){
-                                    store.clearSelectedNotes()
-                                }else{
-                                    store.clearCurrentNote()
-                                }
+                            if(window.confirm("clear this bank?")){
+                                store.selectAllNotes()
+                                store.clearSelectedNotes()
+                                store.setBankName(store.currentBank, "")
+                                store.voiceNeedsUpdate()
                             }
                         }}
                     />

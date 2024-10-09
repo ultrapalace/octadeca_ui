@@ -476,12 +476,14 @@ const setCurrentNoteProp = (self,prop,val) => {
 
 const setCurrentBankProp = (self,prop,val) => {
     self.banks[self.currentBank][prop] = val
+    self.voiceNeedsUpdate()
 }
 
 const setBankName = (self, num, name) => {
     const banks = self.getBanks()
     banks[num].name = name
     self.banks.replace(banks)
+    self.voiceNeedsUpdate()
 }
 
 const setNoteProp = (self,note,prop,val) => {

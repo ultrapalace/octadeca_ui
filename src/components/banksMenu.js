@@ -74,6 +74,7 @@ const BankButton = observer(({i}) => {
                     downloadJSONRef.current.click()
                 } else {
                     store.currentBank = i
+                    store.currentVoice = store.getCurrentBank().voice
                 }
             }}
         >
