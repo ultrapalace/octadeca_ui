@@ -3,14 +3,16 @@ import {store} from '../modules/store.js'
 import {observer} from 'mobx-react-lite'
 import {clamp} from '../helpers/clamp'
 import {Button} from './button'
+import { Stack } from './stack.js';
 import {auditionLocal, auditionDisk} from '../audio/audition'
 import { handleSFZ } from '../helpers/sfz.js';
 import {Text} from '../components/text'
 
-
+import { getNextBank, getNextVoice } from './banksMenu.js';
 
 import {NOTE_OFF,ONE_SHOT,LOOP,PAUSE,ASR_LOOP,RETRIGGER,RESTART,NONE,HALT,IGNORE,RELEASE,
-    PRIORITIES,LINEAR,FIXED,SQUARE_ROOT,INV_SQUARE_ROOT,PAUSE_LOOP,PAUSE_ASR} from '../modules/constants'
+    PRIORITIES,LINEAR,FIXED,SQUARE_ROOT,INV_SQUARE_ROOT,PAUSE_LOOP,PAUSE_ASR,
+    NUM_BANKS} from '../modules/constants'
 import {SelectNum} from '../components/select'
 
 import { Checkbox } from './checkbox.js';
@@ -136,6 +138,18 @@ export const BankDetails = observer(() => {
                         <option value={1}>polyphonic</option>
                         <option value={0}>monophonic</option>
                     </SelectNum>
+                    <div style={{...row, marginLeft:16}}>
+                        <div style={{...column, width:252}}>
+                            <Stack
+                                items = {["voice"]}
+                            />
+                        </div>
+                        <div style={column}>
+                            <Stack
+                                items = {[store.getCurrentBank().voice]}
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 {/*              */}
@@ -172,6 +186,57 @@ export const BankDetails = observer(() => {
                         }}
                     />
                     <Button
+                        style={{width:200}}
+                        title="reorder bank"
+                        onClick={()=>{
+                            const position = parseInt(window.prompt("enter new bank number"))
+                            const banks = store.getBanks()
+                            let numBanks = 0
+                            for(var i=0; i< NUM_BANKS; i++){
+                                if(banks[i].name.length > 0){
+                                    numBanks++
+                                }
+                            }
+                            if(position == NaN){
+                                alert("thats not a number")
+                                return
+                            } else if(position < 1){
+                                alert("minimum position is 1")
+                                return
+                            } else if(position > numBanks){
+                                alert("maximum position is " + numBanks)
+                                return
+                            }
+
+                            const [movedItem] = banks.splice(store.currentBank, 1);
+                            banks.splice(position - 1, 0, movedItem);
+                            store.banks.replace(banks)
+                            store.configNeedsUpdate = true
+                        }}
+                    />
+                    <Button
+                        title="duplicate bank"
+                        style={{width:200}}
+                        onClick={()=>{
+                            const bankToDuplicate = {...store.getBanks()[store.currentBank]}
+                            const nextBank = getNextBank()
+        
+                            if(nextBank == -1){
+                                window.alert("no banks left")
+                                return
+                            }
+        
+                            const name = window.prompt("enter new bank name")
+                            if(!name) return
+                            store.configNeedsUpdate = true
+                            const banks = store.getBanks()
+                            banks[nextBank] = {...bankToDuplicate}
+                            store.setBankName(nextBank, name)
+                            store.currentBank = nextBank
+                            store.banks.replace(banks)
+                        }}
+                    />
+                    <Button
                         warn
                         // style={{border:"1px solid red"}}
                         title="delete"
@@ -181,6 +246,7 @@ export const BankDetails = observer(() => {
                                 store.clearSelectedNotes()
                                 store.setBankName(store.currentBank, "")
                                 store.voiceNeedsUpdate()
+                                store.shuffleBanksLeft()
                             }
                         }}
                     />

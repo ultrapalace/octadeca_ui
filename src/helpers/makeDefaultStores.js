@@ -2,6 +2,17 @@ import {observable} from 'mobx'
 import {IGNORE, NOTE_ON, ONE_SHOT, RETRIGGER, EDGE_FALLING, EDGE_NONE, ROOT_SQUARE, SQUARE_ROOT, NUM_BANKS} from '../modules/constants'
 import { store } from '../modules/store'
 
+export const defaultBank = {
+    name: "",
+    voice: -1,
+    midiChannel: 0,
+    transpose: 0,
+    pitchbendRangeUp: 2,
+    pitchbendRangeDown: 2,
+    responseCurve: SQUARE_ROOT,
+    polyphonic: 1
+}
+
 export const defaultBanks = () => {
     const banks = [{
         name: "default",
@@ -14,16 +25,7 @@ export const defaultBanks = () => {
         polyphonic: 1
     }]
     for(let i=1; i<NUM_BANKS; i++){
-        banks.push({
-            name: "",
-            voice: i,
-            midiChannel: 0,
-            transpose: 0,
-            pitchbendRangeUp: 2,
-            pitchbendRangeDown: 2,
-            responseCurve: SQUARE_ROOT,
-            polyphonic: 1
-        })
+        banks.push({...defaultBank})
     }
     return observable(banks)
 }

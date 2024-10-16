@@ -5,10 +5,28 @@ import {observer} from 'mobx-react-lite'
 import {Button} from '../components/button'
 import { NUM_BANKS } from '../modules/constants.js';
 
-const getNextBank = () => {
+export const getNextBank = () => {
     for(var i=0; i<NUM_BANKS; i++){
         const name = store.banks[i].name
         if(name.length == 0){
+            return i
+        }
+    }
+    return -1
+}
+
+export const getNextVoice = () => {
+    for(var i=0; i<NUM_BANKS; i++){
+        var j
+        for(j=0; j<NUM_BANKS; j++){
+            if(
+                store.banks[j].voice == i &&
+                store.banks[j].name.length > 0
+            ){
+                break;
+            }
+        }
+        if(j == NUM_BANKS){
             return i
         }
     }
@@ -36,15 +54,24 @@ const BankButton = observer(({i}) => {
                 title="new bank"
                 onClick={()=>{
                     const nextBank = getNextBank()
+                    const nextVoice = getNextVoice()
+                    console.log("picked voice " + nextVoice + ", bank " + nextBank)
+
                     if(nextBank == -1){
                         window.alert("no banks left")
                         return
                     }
+                    if(nextVoice == -1){
+                        window.alert("no voices left")
+                        return
+                    }
+
                     const name = window.prompt("enter new bank name")
                     if(!name) return
                     store.configNeedsUpdate = true
                     store.setBankName(nextBank, name)
                     store.currentBank = nextBank
+                    store.setCurrentBankProp("voice", nextVoice)
                 }}
             >
                 <Text primary medium>

@@ -1,9 +1,9 @@
 import {observable, configure, toJS} from 'mobx'
 import {themes} from './themes.js'
-import {MAX_LAYERS_PER_RACK, WAV_ITEM_SIZE, NUM_RACK_SLOTS} from './constants'
+import {MAX_LAYERS_PER_RACK, WAV_ITEM_SIZE, NUM_RACK_SLOTS, NUM_BANKS, SQUARE_ROOT} from './constants'
 import {clamp} from '../helpers/clamp.js'
 import {makeName, makeRackName} from '../helpers/makeName'
-import {defaultVoices, defaultBanks, defaultPinConfig, defaultMetadata, default_fx} from '../helpers/makeDefaultStores'
+import {defaultVoices, defaultBanks, defaultPinConfig, defaultMetadata, default_fx, defaultBank} from '../helpers/makeDefaultStores'
 import { parseDirectories } from '../helpers/parseDirectories.js'
 import {numberSort} from '../helpers/numberSort'
 import { analyzeWav } from '../audio/analyzeWav.js'
@@ -116,6 +116,7 @@ export const store = observable(
         getVoiceData:function(num){return getVoiceData(this, num)},
         setVoiceData:function(num, data){return setVoiceData(this, num, data)},
         selectAllNotes:function(){return selectAllNotes(this)},
+        shuffleBanksLeft:function(){return shuffleBanksLeft(this)},
     }
 )
 
@@ -684,4 +685,38 @@ const setVoiceData = (self, num, data) => {
 const selectAllNotes = self => {
     const all = Array(128).fill().map((_,i)=>i)
     self.wavBoardRange.replace(all)
+}
+
+const shuffleBanksLeft = self => {
+    const banks = self.getBanks()
+    console.log({banks})
+    for(var i=0; i<NUM_BANKS; i++){
+        if(banks[i].name.length == 0){
+            banks.splice(i, 1)
+            banks.push(defaultBank)
+            // console.log("bank " + i + " found empty")
+            // for(var j = i; j < NUM_BANKS - 1; j++){
+            //     console.log("shuffling " + j)
+
+            //     banks[j].name = banks[j + 1].name
+            //     banks[j].voice = banks[j + 1].voice
+            //     banks[j].midiChannel = banks[j + 1].midiChannel
+            //     banks[j].transpose = banks[j + 1].transpose
+            //     banks[j].pitchbendRangeUp = banks[j + 1].pitchbendRangeUp
+            //     banks[j].pitchbendRangeDown = banks[j + 1].pitchbendRangeDown
+            //     banks[j].responseCurve = banks[j + 1].responseCurve
+            //     banks[j].polyphonic = banks[j + 1].polyphonic
+
+            //     banks[j + 1].name = ""
+            //     banks[j + 1].voice = -1
+            //     banks[j + 1].midiChannel = 0
+            //     banks[j + 1].transpose = 0
+            //     banks[j + 1].pitchbendRangeUp = 2
+            //     banks[j + 1].pitchbendRangeDown = 2
+            //     banks[j + 1].responseCurve = SQUARE_ROOT
+            //     banks[j + 1].polyphonic = 1
+            // }
+        }
+    }
+    self.banks.replace(banks)
 }
